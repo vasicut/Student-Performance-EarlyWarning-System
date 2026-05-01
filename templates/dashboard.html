@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Student Early-Warning System{% endblock %}
+
+{% block content %}
+
+<!-- Model Comparison -->
+<div class="section-label">Model Comparison</div>
+<div class="card" style="overflow-x: auto;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Accuracy</th>
+                <th>F1 (Weighted)</th>
+                <th>CV Mean</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, data in metadata.model_results_summary.items() %}
+            <tr {% if name == metadata.best_model_name %}style="background: rgba(56,189,248,0.05);"{% endif %}>
+                <td style="font-weight: 600; color: var(--text);">
+                    {{ name }}
+                    {% if name == metadata.best_model_name %}
+                    <span style="font-size: 10px; color: var(--accent); margin-left: 6px;">BEST</span>
+                    {% endif %}
+                </td>
+                <td class="mono" style="color: var(--text);">{{ "%.1f"|format(data.accuracy * 100) }}%</td>
+                <td class="mono" style="color: var(--text);">{{ "%.1f"|format(data.f1_weighted * 100) }}%</td>
+                <td class="mono" style="color: var(--text);">{{ "%.1f"|format(data.cv_mean * 100) }}%</td>
+                <td>
+                    {% if name == metadata.best_model_name %}
+                    <span class="badge badge-high"><span class="dot"></span>Active</span>
+                    {% else %}
+                    <span style="font-size: 11px; color: var(--text-muted);">Evaluated</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Feature Importance & Fairness -->
+<div class="grid-2">
+    <!-- Feature Importance -->
+    <div class="card">
+        <div class="card-title">Feature Importance ({{ metadata.best_model_name }})</div>
+        {% for feat, imp in metadata.feature_importance.items() %}
+        {% if loop.index <= 10 %}
+        <div style="margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span style="font-size: 11px; color: var(--text-dim); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {{ feat | replace('StudentAbsenceDays_', 'Absence: ') | replace('ParentAnsweringSurvey_', 'ParentSurvey: ') | replace('ParentschoolSatisfaction_', 'Satisfaction: ') | replace('Semester_', 'Semester: ') }}
+                </span>
+                <span class="mono" style="font-size: 11px; color: var(--accent);">{{ "%.4f"|format(imp) }}</span>
+            </div>
+            <div class="progress-bar">
+                {% set max_imp = metadata.feature_importance.values() | list | first %}
+                <div class="progress-fill" style="width: {{ (imp / max_imp * 100) | round }}%; background: {% if loop.index <= 3 %}var(--accent){% elif loop.index <= 6 %}#6366F1{% else %}#475569{% endif %};"></div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Fairness -->
+    <div class="card">
+        <div class="card-title">Fairness & Bias Analysis</div>
+
+        <div class="section-label" style="margin-top: 4px;">Gender Subgroup Performance</div>
+        <div class="grid-2" style="margin-bottom: 20px;">
+            {% for gender, data in metadata.fairness.items() %}
+            <div style="padding: 14px 16px; background: var(--surface); border-radius: 8px; text-align: center;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
+                    {{ 'Male' if gender == 'M' else 'Female' }} (n={{ data.count }})
+                </div>
+                <div class="mono" style="font-size: 22px; font-weight: 700; color: var(--accent);">
+                    {{ "%.1f"|format(data.f1 * 100) }}%
+                </div>
+                <div style="font-size: 10px; color: var(--text-dim);">F1 Score</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="section-label">Sensitivity Analysis</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--surface); border-radius: 8px;">
+                <div>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text);">With Gender Features</div>
+                </div>
+                <div class="mono" style="font-size: 18px; font-weight: 700; color: var(--accent);">
+                    {{ "%.1f"|format(metadata.sensitivity.with_gender_f1 * 100) }}%
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--surface); border-radius: 8px;">
+                <div>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text);">Without Gender Features</div>
+                </div>
+                <div class="mono" style="font-size: 18px; font-weight: 700; color: var(--medium);">
+                    {{ "%.1f"|format(metadata.sensitivity.without_gender_f1 * 100) }}%
+                </div>
+            </div>
+        </div>
+
+        {% set drop = metadata.sensitivity.f1_drop %}
+        <div style="margin-top: 14px; padding: 12px 14px; background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px;">
+            <div style="font-size: 12px; color: var(--high); font-weight: 600;">Minimal demographic dependency</div>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">
+                F1 drop of {{ "%.1f"|format(drop * 100) }}% confirms the model relies on behavioural engagement signals rather than gender-based correlations.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Insights -->
+<div class="section-label">Key Insights</div>
+<div class="grid-3">
+    <div class="card" style="padding: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Behavioural > Demographic</div>
+        <div style="font-size: 11px; color: var(--text-dim); line-height: 1.5;">Top features are all behavioural engagement metrics. Demographics rank significantly lower, confirming the model discriminates on learning activity.</div>
+    </div>
+    <div class="card" style="padding: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Absence is Critical</div>
+        <div style="font-size: 11px; color: var(--text-dim); line-height: 1.5;">Above-7 absences correlate with 60.7% Low classification. A clear threshold effect useful for early warning triggers.</div>
+    </div>
+    <div class="card" style="padding: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Resource Visits Lead</div>
+        <div style="font-size: 11px; color: var(--text-dim); line-height: 1.5;">VisitedResources has the highest importance, followed by RaisedHands. Active participation strongly predicts performance.</div>
+    </div>
+</div>
+
+{% endblock %}

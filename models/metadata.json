@@ -1,0 +1,113 @@
+{
+  "class_names": [
+    "H",
+    "L",
+    "M"
+  ],
+  "categorical_columns": [
+    "gender",
+    "NationalITy",
+    "PlaceofBirth",
+    "StageID",
+    "GradeID",
+    "SectionID",
+    "Topic",
+    "Semester",
+    "Relation",
+    "ParentAnsweringSurvey",
+    "ParentschoolSatisfaction",
+    "StudentAbsenceDays"
+  ],
+  "numerical_columns": [
+    "raisedhands",
+    "VisITedResources",
+    "AnnouncementsView",
+    "Discussion"
+  ],
+  "best_model_name": "Random Forest",
+  "best_model_params": {
+    "bootstrap": "True",
+    "ccp_alpha": "0.0",
+    "class_weight": "None",
+    "criterion": "gini",
+    "max_depth": "10",
+    "max_features": "sqrt",
+    "max_leaf_nodes": "None",
+    "max_samples": "None",
+    "min_impurity_decrease": "0.0",
+    "min_samples_leaf": "1",
+    "min_samples_split": "2",
+    "min_weight_fraction_leaf": "0.0",
+    "monotonic_cst": "None",
+    "n_estimators": "200",
+    "n_jobs": "None",
+    "oob_score": "False",
+    "random_state": "42",
+    "verbose": "0",
+    "warm_start": "False"
+  },
+  "test_accuracy": 0.8125,
+  "test_f1_weighted": 0.8122701018391852,
+  "cv_mean": 0.8007549497609151,
+  "cv_std": 0.07183251749103427,
+  "feature_importance": {
+    "VisITedResources": 0.1400082464419269,
+    "raisedhands": 0.11352386373283153,
+    "AnnouncementsView": 0.09233454439897106,
+    "StudentAbsenceDays_Above-7": 0.08065396211001125,
+    "StudentAbsenceDays_Under-7": 0.07762341247207831,
+    "Discussion": 0.06781698191368336,
+    "ParentAnsweringSurvey_Yes": 0.025774101081617602,
+    "ParentAnsweringSurvey_No": 0.025573131678783705,
+    "Relation_Mum": 0.024834374162796696,
+    "Relation_Father": 0.024385714277324718,
+    "ParentschoolSatisfaction_Bad": 0.020558787473636757,
+    "ParentschoolSatisfaction_Good": 0.0163247871473863,
+    "gender_M": 0.015024927506922572,
+    "gender_F": 0.014944739130084065,
+    "NationalITy_Jordan": 0.012123095748195005
+  },
+  "model_results_summary": {
+    "Logistic Regression": {
+      "accuracy": 0.7083333333333334,
+      "f1_weighted": 0.7067467124070897,
+      "cv_mean": 0.7661384489029177
+    },
+    "SVM": {
+      "accuracy": 0.7916666666666666,
+      "f1_weighted": 0.7900018300083697,
+      "cv_mean": 0.7643459424704586
+    },
+    "Random Forest": {
+      "accuracy": 0.8125,
+      "f1_weighted": 0.8122701018391852,
+      "cv_mean": 0.8007549497609151
+    },
+    "XGBoost": {
+      "accuracy": 0.7291666666666666,
+      "f1_weighted": 0.7268518518518517,
+      "cv_mean": 0.7599966041129602
+    }
+  },
+  "fairness": {
+    "M": {
+      "f1": 0.8169549748497117,
+      "accuracy": 0.8181818181818182,
+      "recall": 0.8181818181818182,
+      "precision": 0.8168686868686869,
+      "count": 55
+    },
+    "F": {
+      "f1": 0.8065518890483023,
+      "accuracy": 0.8048780487804879,
+      "recall": 0.8048780487804879,
+      "precision": 0.8126893033636219,
+      "count": 41
+    }
+  },
+  "sensitivity": {
+    "with_gender_f1": 0.8122701018391852,
+    "without_gender_f1": 0.781311039741567,
+    "f1_drop": 0.03095906209761823
+  }
+}

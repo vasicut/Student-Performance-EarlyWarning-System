@@ -1,0 +1,96 @@
+{
+  "gender": [
+    "F",
+    "M"
+  ],
+  "NationalITy": [
+    "Egypt",
+    "Iran",
+    "Iraq",
+    "Jordan",
+    "KW",
+    "Lybia",
+    "Morocco",
+    "Palestine",
+    "SaudiArabia",
+    "Syria",
+    "Tunis",
+    "USA",
+    "lebanon",
+    "venzuela",
+    "UK"
+  ],
+  "PlaceofBirth": [
+    "Egypt",
+    "Iran",
+    "Iraq",
+    "Jordan",
+    "KuwaIT",
+    "Lybia",
+    "Morocco",
+    "Palestine",
+    "SaudiArabia",
+    "Syria",
+    "Tunis",
+    "USA",
+    "lebanon",
+    "venzuela",
+    "UK"
+  ],
+  "StageID": [
+    "HighSchool",
+    "MiddleSchool",
+    "lowerlevel"
+  ],
+  "GradeID": [
+    "G-02",
+    "G-04",
+    "G-05",
+    "G-06",
+    "G-07",
+    "G-08",
+    "G-09",
+    "G-10",
+    "G-11",
+    "G-12"
+  ],
+  "SectionID": [
+    "A",
+    "B",
+    "C"
+  ],
+  "Topic": [
+    "Arabic",
+    "Biology",
+    "Chemistry",
+    "English",
+    "French",
+    "Geology",
+    "History",
+    "IT",
+    "Math",
+    "Quran",
+    "Science",
+    "Spanish"
+  ],
+  "Semester": [
+    "F",
+    "S"
+  ],
+  "Relation": [
+    "Father",
+    "Mum"
+  ],
+  "ParentAnsweringSurvey": [
+    "No",
+    "Yes"
+  ],
+  "ParentschoolSatisfaction": [
+    "Bad",
+    "Good"
+  ],
+  "StudentAbsenceDays": [
+    "Above-7",
+    "Under-7"
+  ]
+}

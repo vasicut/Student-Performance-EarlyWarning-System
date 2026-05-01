@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Result — Student Early-Warning System{% endblock %}
+
+{% block content %}
+
+{% set color_map = {'H': 'high', 'M': 'medium', 'L': 'low'} %}
+{% set risk_color = color_map.get(result.prediction, 'text-dim') %}
+{% set alert_class = {'H': 'alert-success', 'M': 'alert-warning', 'L': 'alert-danger'}.get(result.prediction, '') %}
+
+<!-- Prediction Result -->
+<div class="alert {{ alert_class }}">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div class="alert-title" style="color: var(--{{ risk_color }}); font-size: 18px;">
+                {{ result.risk_level }}
+            </div>
+            <div class="alert-text">
+                Predicted academic performance: <strong style="color: var(--{{ risk_color }});">{{ result.prediction_full }} ({{ result.prediction }})</strong>
+            </div>
+        </div>
+        <div>
+            <span class="badge badge-{{ risk_color }}" style="font-size: 16px; padding: 8px 18px;">
+                <span class="dot"></span>
+                {{ result.prediction_full }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+
+    <!-- Probability Scores -->
+    <div class="card">
+        <div class="card-title">Prediction Confidence</div>
+        {% if result.probabilities %}
+        {% for cls, prob in result.probabilities.items() %}
+        {% set cls_color = color_map.get(cls, 'accent') %}
+        <div style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--text);">
+                    {{ {'H': 'High', 'M': 'Medium', 'L': 'Low'}.get(cls, cls) }} ({{ cls }})
+                </span>
+                <span class="mono" style="font-size: 13px; font-weight: 700; color: var(--{{ cls_color }});">{{ prob }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ prob }}%; background: var(--{{ cls_color }});"></div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="font-size: 12px; color: var(--text-dim);">Probability scores not available for this model configuration.</p>
+        {% endif %}
+    </div>
+
+    <!-- Input Summary -->
+    <div class="card">
+        <div class="card-title">Input Summary</div>
+        <table class="table">
+            <tr><td style="color: var(--text-dim);">Gender</td><td class="mono">{{ result.input_summary.gender }}</td></tr>
+            <tr><td style="color: var(--text-dim);">Topic</td><td class="mono">{{ result.input_summary.topic }}</td></tr>
+            <tr><td style="color: var(--text-dim);">Raised Hands</td><td class="mono">{{ result.input_summary.raised_hands }}</td></tr>
+            <tr><td style="color: var(--text-dim);">Visited Resources</td><td class="mono">{{ result.input_summary.visited_resources }}</td></tr>
+            <tr><td style="color: var(--text-dim);">Absence Days</td>
+                <td>
+                    {% if result.input_summary.absence == 'Above-7' %}
+                    <span style="color: var(--low); font-weight: 600;">{{ result.input_summary.absence }}</span>
+                    {% else %}
+                    <span style="color: var(--high); font-weight: 600;">{{ result.input_summary.absence }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- Recommendations -->
+<div class="card">
+    <div class="card-title" style="font-size: 15px;">
+        {% if result.prediction == 'L' %}
+        &#9888; Intervention Recommendations
+        {% elif result.prediction == 'M' %}
+        Monitoring Recommendations
+        {% else %}
+        Positive Indicators
+        {% endif %}
+    </div>
+    <div style="display: grid; gap: 10px;">
+        {% for rec in result.recommendations %}
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 8px;">
+            <span style="color: var(--{{ risk_color }}); font-size: 16px; margin-top: 1px;">
+                {% if result.prediction == 'L' %}&#9679;{% elif result.prediction == 'M' %}&#9675;{% else %}&#10003;{% endif %}
+            </span>
+            <span style="font-size: 13px; color: var(--text); line-height: 1.5;">{{ rec }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Actions -->
+<div style="display: flex; gap: 12px; margin-top: 8px;">
+    <a href="/" class="btn btn-primary">New Prediction</a>
+    <a href="/dashboard" class="btn btn-outline">View Dashboard</a>
+</div>
+
+{% endblock %}

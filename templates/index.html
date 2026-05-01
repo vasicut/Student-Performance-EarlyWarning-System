@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Predict — Student Early-Warning System{% endblock %}
+
+{% block content %}
+
+<div class="grid-4" style="margin-bottom: 20px;">
+    <div class="card">
+        <div class="stat-box">
+            <div class="stat-label">Model</div>
+            <div class="stat-value" style="font-size: 22px;">{{ metadata.best_model_name }}</div>
+            <div class="stat-sub">Best performing classifier</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="stat-box">
+            <div class="stat-label">Test Accuracy</div>
+            <div class="stat-value">{{ "%.1f"|format(metadata.test_accuracy * 100) }}%</div>
+            <div class="stat-sub">On held-out test set</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="stat-box">
+            <div class="stat-label">F1 Score</div>
+            <div class="stat-value" style="color: var(--high);">{{ "%.1f"|format(metadata.test_f1_weighted * 100) }}%</div>
+            <div class="stat-sub">Weighted F1</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="stat-box">
+            <div class="stat-label">CV Score</div>
+            <div class="stat-value" style="color: var(--medium);">{{ "%.1f"|format(metadata.cv_mean * 100) }}%</div>
+            <div class="stat-sub">10-Fold Stratified</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title" style="font-size: 16px; margin-bottom: 4px;">Student Data Input</div>
+    <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 24px;">
+        Enter student information below. The model will predict academic performance class (High / Medium / Low) and generate early-warning recommendations.
+    </p>
+
+    <form action="/predict" method="POST">
+
+        <div class="section-label">Demographic Information</div>
+        <div class="grid-3" style="margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label" for="gender">Gender</label>
+                <select name="gender" id="gender" class="form-control" required>
+                    {% for opt in column_options.get('gender', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="NationalITy">Nationality</label>
+                <select name="NationalITy" id="NationalITy" class="form-control" required>
+                    {% for opt in column_options.get('NationalITy', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="PlaceofBirth">Place of Birth</label>
+                <select name="PlaceofBirth" id="PlaceofBirth" class="form-control" required>
+                    {% for opt in column_options.get('PlaceofBirth', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="section-label">Academic Information</div>
+        <div class="grid-3" style="margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label" for="StageID">Education Stage</label>
+                <select name="StageID" id="StageID" class="form-control" required>
+                    {% for opt in column_options.get('StageID', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="GradeID">Grade Level</label>
+                <select name="GradeID" id="GradeID" class="form-control" required>
+                    {% for opt in column_options.get('GradeID', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="SectionID">Section</label>
+                <select name="SectionID" id="SectionID" class="form-control" required>
+                    {% for opt in column_options.get('SectionID', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="Topic">Subject/Topic</label>
+                <select name="Topic" id="Topic" class="form-control" required>
+                    {% for opt in column_options.get('Topic', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="Semester">Semester</label>
+                <select name="Semester" id="Semester" class="form-control" required>
+                    {% for opt in column_options.get('Semester', []) %}
+                    <option value="{{ opt }}">{{ 'First' if opt == 'F' else 'Second' }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="Relation">Guardian Relation</label>
+                <select name="Relation" id="Relation" class="form-control" required>
+                    {% for opt in column_options.get('Relation', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="section-label">Behavioural Engagement</div>
+        <div class="grid-2" style="margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label" for="raisedhands">
+                    Raised Hands: <span class="range-value" id="rh-val">50</span>
+                </label>
+                <input type="range" name="raisedhands" id="raisedhands" class="form-control"
+                       min="0" max="100" value="50" oninput="document.getElementById('rh-val').textContent=this.value">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="VisITedResources">
+                    Visited Resources: <span class="range-value" id="vr-val">50</span>
+                </label>
+                <input type="range" name="VisITedResources" id="VisITedResources" class="form-control"
+                       min="0" max="100" value="50" oninput="document.getElementById('vr-val').textContent=this.value">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="AnnouncementsView">
+                    Announcements Viewed: <span class="range-value" id="av-val">50</span>
+                </label>
+                <input type="range" name="AnnouncementsView" id="AnnouncementsView" class="form-control"
+                       min="0" max="100" value="50" oninput="document.getElementById('av-val').textContent=this.value">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="Discussion">
+                    Discussion Participation: <span class="range-value" id="d-val">50</span>
+                </label>
+                <input type="range" name="Discussion" id="Discussion" class="form-control"
+                       min="0" max="100" value="50" oninput="document.getElementById('d-val').textContent=this.value">
+            </div>
+        </div>
+
+        <div class="section-label">Additional Factors</div>
+        <div class="grid-3" style="margin-bottom: 28px;">
+            <div class="form-group">
+                <label class="form-label" for="StudentAbsenceDays">Absence Days</label>
+                <select name="StudentAbsenceDays" id="StudentAbsenceDays" class="form-control" required>
+                    {% for opt in column_options.get('StudentAbsenceDays', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="ParentAnsweringSurvey">Parent Answered Survey</label>
+                <select name="ParentAnsweringSurvey" id="ParentAnsweringSurvey" class="form-control" required>
+                    {% for opt in column_options.get('ParentAnsweringSurvey', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="ParentschoolSatisfaction">Parent Satisfaction</label>
+                <select name="ParentschoolSatisfaction" id="ParentschoolSatisfaction" class="form-control" required>
+                    {% for opt in column_options.get('ParentschoolSatisfaction', []) %}
+                    <option value="{{ opt }}">{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
+            Predict Academic Performance
+        </button>
+    </form>
+</div>
+
+{% endblock %}

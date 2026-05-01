@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Error — Student Early-Warning System{% endblock %}
+{% block content %}
+<div class="alert alert-danger">
+    <div class="alert-title" style="color: var(--low);">Prediction Error</div>
+    <div class="alert-text">{{ error }}</div>
+</div>
+<a href="/" class="btn btn-primary">Try Again</a>
+{% endblock %}
