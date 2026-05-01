@@ -1,7 +1,12 @@
 # Student Performance Early-Warning System
 
 **Predictive Analytics for Student Academic Performance Using Machine Learning**  
-CMP600 – Dissertation | BSc (Hons) Computing [Top-up]
+
+
+
+This project was developed as part of a Level 6 dissertation for CMP600.
+
+It demonstrates the application of machine learning techniques for early identification of at-risk students.
 
 
 ---
